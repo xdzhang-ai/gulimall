@@ -1,0 +1,50 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+
+    gateway:
+      routes:
+#        - id: baidu_route
+#          uri: https://www.baidu.com
+#          predicates:
+#            - Query=url,baidu
+#
+#        - id: qq_route
+#          uri: https://www.qq.com
+#          predicates:
+#            - Query=url,qq
+
+        - id: product_route
+          uri: lb://gulimall-product # 路由给renren-fast，lb代表负载均衡
+          predicates: # 什么情况下路由给它
+            - Path=/api/product/** # 默认前端项目都带上api前缀，
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
+
+        - id: product_route
+          uri: lb://gulimall-member # 路由给renren-fast，lb代表负载均衡
+          predicates: # 什么情况下路由给它
+            - Path=/api/member/** # 默认前端项目都带上api前缀，
+          filters:
+            - RewritePath=/api/(?<segment>.*),/$\{segment}
+
+        - id: thirdparty_route
+          uri: lb://gulimall-third-party # 路由给renren-fast，lb代表负载均衡
+          predicates: # 什么情况下路由给它
+            - Path=/api/thirdparty/** # 默认前端项目都带上api前缀，
+          filters:
+            - RewritePath=/api/thirdparty/(?<segment>.*),/$\{segment}
+
+        - id: admin_route
+          uri: lb://renren-fast # 路由给renren-fast，lb代表负载均衡
+          predicates: # 什么情况下路由给它
+            - Path=/api/** # 默认前端项目都带上api前缀，
+          filters:
+            - RewritePath=/api/(?<segment>.*),/renren-fast/$\{segment}
+
+  application:
+    name: gulimall-gateway
+
+
